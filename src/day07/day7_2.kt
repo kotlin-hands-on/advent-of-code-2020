@@ -2,11 +2,13 @@ package day07
 
 import java.io.File
 
-val containers = hashMapOf<String, Collection<String>>()
+val containedInBag = hashMapOf<String, Collection<String>>()
+
+private const val SHINY_GOLD = "shiny gold"
 
 fun main() {
     buildBagTree()
-    println("shiny gold".childrenCount)
+    println(SHINY_GOLD.childrenCount)
 }
 
 private fun buildBagTree() {
@@ -20,7 +22,7 @@ private fun buildBagTree() {
                 if (!raw.contains("no other"))
                     parentWithChildren[1].split(',').map { it.trim() }
                 else setOf()
-            containers[parent] = children
+            containedInBag[parent] = children
         }
 }
 
@@ -28,7 +30,7 @@ val digits = "\\d+".toRegex()
 
 private val String.childrenCount: Int
     get() {
-        val children = containers.getOrDefault(this, setOf())
+        val children = containedInBag.getOrDefault(this, setOf())
         if (children.isEmpty()) return 0
         var total = 0
         for (child in children) {

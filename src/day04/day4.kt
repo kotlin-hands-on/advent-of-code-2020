@@ -4,18 +4,21 @@ import java.io.File
 
 val passports = File("src/day04/input.txt")
     .readText()
+    .trim()
     .split("\n\n")
-    .map { Passport.fromString(it.replace("\n", " ").trim()) }
+    .map { Passport.fromString(it) }
 
 
 class Passport(private val map: Map<String, String>) {
 
     companion object {
         fun fromString(s: String): Passport {
-            return Passport(s.split(" ").associate {
+            val fieldsAndValues = s.split(" ", "\n")
+            val map = fieldsAndValues.associate {
                 val (key, value) = it.split(":")
                 key to value
-            })
+            }
+            return Passport(map)
         }
     }
 

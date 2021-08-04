@@ -10,7 +10,7 @@ fun main() {
         .readText()
         .trim()
         .split("$newLine$newLine").sumOf {
-            it.replace(newLine, "").toList().distinct().size
+            it.replace(newLine, "").toSet().size
         }
 
     println(answer)

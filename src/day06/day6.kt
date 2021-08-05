@@ -19,7 +19,7 @@ fun main() {
     println("First answer: $firstAnswer")
 
     val secondAnswer = groups.map { it.split(newLine).map { s -> s.toSet() } }
-        .fold(0) { sum, group -> sum + group.fold(group.first()) { a, b -> a intersect b }.count() }
+        .sumOf {it.fold(it.first()) { a, b -> a intersect b }.count()}
 
     println("Second answer: $secondAnswer")
 }

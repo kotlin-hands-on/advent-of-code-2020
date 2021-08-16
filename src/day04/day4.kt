@@ -31,19 +31,19 @@ class Passport(private val map: Map<String, String>) {
     }
 
     private val fieldValidationRules: Map<String, (String) -> Boolean> = mapOf(
-        "byr" to { it.isDigits(4) && it.toInt() in 1920..2002 },
-        "iyr" to { it.isDigits(4) && it.toInt() in 2010..2020 },
-        "eyr" to { it.isDigits(4) && it.toInt() in 2020..2030 },
+        "byr" to { it.length == 4 && it.toIntOrNull() in 1920..2002 },
+        "iyr" to { it.length == 4 && it.toIntOrNull() in 2010..2020 },
+        "eyr" to { it.length == 4 && it.toIntOrNull() in 2020..2030 },
+        "pid" to { it.length == 9 && it.toIntOrNull() != null },
+        "ecl" to { it in setOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth") },
         "hgt" to {
             when (it.takeLast(2)) {
-                "cm" -> it.removeSuffix("cm").toInt() in 150..193
-                "in" -> it.removeSuffix("in").toInt() in 59..76
+                "cm" -> it.removeSuffix("cm").toIntOrNull() in 150..193
+                "in" -> it.removeSuffix("in").toIntOrNull() in 59..76
                 else -> false
             }
         },
         "hcl" to { it matches """#[0-9a-f]{6}""".toRegex() },
-        "ecl" to { it in listOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth") },
-        "pid" to { it.isDigits(9) }
     )
 
     fun hasValidValues(): Boolean {

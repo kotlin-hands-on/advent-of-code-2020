@@ -2,12 +2,10 @@ package day04
 
 import java.io.File
 
-val newLine = System.lineSeparator()
-
 val passports = File("src/day04/input.txt")
     .readText()
     .trim()
-    .split("$newLine$newLine")
+    .split("\n\n", "\r\n\r\n")
     .map { Passport.fromString(it) }
 
 
@@ -15,7 +13,7 @@ class Passport(private val map: Map<String, String>) {
 
     companion object {
         fun fromString(s: String): Passport {
-            val fieldsAndValues = s.split(" ", newLine)
+            val fieldsAndValues = s.split(" ", "\n", "\r\n")
             val map = fieldsAndValues.associate {
                 val (key, value) = it.split(":")
                 key to value
@@ -30,32 +28,23 @@ class Passport(private val map: Map<String, String>) {
         return map.keys.containsAll(requiredFields)
     }
 
-    private val fieldValidationRules: Map<String, (String) -> Boolean> = mapOf(
-        "byr" to { it.length == 4 && it.toIntOrNull() in 1920..2002 },
-        "iyr" to { it.length == 4 && it.toIntOrNull() in 2010..2020 },
-        "eyr" to { it.length == 4 && it.toIntOrNull() in 2020..2030 },
-        "pid" to { it.length == 9 && it.toIntOrNull() != null },
-        "ecl" to { it in setOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth") },
-        "hgt" to {
-            when (it.takeLast(2)) {
-                "cm" -> it.removeSuffix("cm").toIntOrNull() in 150..193
-                "in" -> it.removeSuffix("in").toIntOrNull() in 59..76
-                else -> false
+    fun hasValidValues(): Boolean =
+        map.all { (key, value) ->
+            when (key) {
+                "byr" -> value.length == 4 && value.toIntOrNull() in 1920..2002
+                "iyr" -> value.length == 4 && value.toIntOrNull() in 2010..2020
+                "eyr" -> value.length == 4 && value.toIntOrNull() in 2020..2030
+                "pid" -> value.length == 9 && value.all(Char::isDigit)
+                "ecl" -> value in setOf("amb", "blu", "brn", "gry", "grn", "hzl", "oth")
+                "hgt" -> when (value.takeLast(2)) {
+                    "cm" -> value.removeSuffix("cm").toIntOrNull() in 150..193
+                    "in" -> value.removeSuffix("in").toIntOrNull() in 59..76
+                    else -> false
+                }
+                "hcl" -> value matches """#[0-9a-f]{6}""".toRegex()
+                else -> true
             }
-        },
-        "hcl" to { it matches """#[0-9a-f]{6}""".toRegex() },
-    )
-
-    fun hasValidValues(): Boolean {
-        return fieldValidationRules.all { (key, validator) ->
-            val field = map[key] ?: return@all false
-            validator(field)
         }
-    }
-}
-
-fun String.isDigits(n: Int): Boolean {
-    return this.length == n && this.all { it.isDigit() }
 }
 
 fun main() {
@@ -68,5 +57,5 @@ fun partOne() {
 }
 
 fun partTwo() {
-    println(passports.count(Passport::hasValidValues))
+    println(passports.count { it.hasAllRequiredFields() && it.hasValidValues() })
 }

@@ -6,7 +6,7 @@ fun main() {
     val seatIDs = File("src/day05/input.txt")
         .readLines()
         .map(String::toSeatID)
-    val maxID = seatIDs.maxOrNull()!!
+    val maxID = seatIDs.maxOf { it }
     println("Max seat ID: $maxID")
 
     val occupiedSeatsSet = seatIDs.toSet()
@@ -17,7 +17,7 @@ fun main() {
     println("My seat ID: $mySeat")
 }
 
-fun String.toSeatID(): Int =
-    replace("B", "1").replace("F", "0")
-        .replace("R", "1").replace("L", "0")
-        .toInt(radix = 2)
+fun String.toSeatID(): Int = this
+    .replace('B', '1').replace('F', '0')
+    .replace('R', '1').replace('L', '0')
+    .toInt(radix = 2)

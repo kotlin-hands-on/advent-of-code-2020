@@ -16,10 +16,13 @@ fun main() {
         it.replace(newLine, "").toSet().size
     }
 
-    println("First answer: $firstAnswer")
+    println("First answer: $firstAnswer") // 6273
 
-    val secondAnswer = groups.map { it.split(newLine).map { s -> s.toSet() } }
-        .sumOf {it.fold(it.first()) { a, b -> a intersect b }.count()}
+    val secondAnswer = groups.map { lines ->
+        lines.split(newLine).map { s -> s.toSet() }
+    }.sumOf { characters ->
+        characters.reduce { a, b -> a intersect b }.count()
+    }
 
-    println("Second answer: $secondAnswer")
+    println("Second answer: $secondAnswer") // 3254
 }

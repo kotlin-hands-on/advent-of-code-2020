@@ -19,7 +19,7 @@ fun main() {
     println("First answer: $firstAnswer") // 6273
 
     val secondAnswer = groups.map { lines ->
-        lines.split(newLine).map { s -> s.toSet() }
+        lines.split(newLine).map(String::toSet)
     }.sumOf { characters ->
         characters.reduce { a, b -> a intersect b }.count()
     }

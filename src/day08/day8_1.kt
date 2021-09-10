@@ -22,9 +22,7 @@ fun execute(instructions: List<Instruction>): MachineState {
     val encounteredIndices = mutableSetOf<Int>()
     while (state.ip < instructions.size) {
         val nextInstruction = instructions[state.ip]
-        println("Instruction: $nextInstruction, State: $state" )
         state = nextInstruction.action(state)
-        println("=========================> State: $state" )
         if (state.ip in encounteredIndices) return state
         encounteredIndices += state.ip
     }

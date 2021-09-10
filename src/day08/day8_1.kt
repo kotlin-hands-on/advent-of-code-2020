@@ -32,22 +32,6 @@ fun execute(instructions: List<Instruction>): MachineState {
     return state
 }
 
-fun execute1(instructions: List<Instruction>): MachineState {
-
-    var state = MachineState(0, 0)
-    val encounteredIndices = mutableSetOf<Int>()
-    for (instruction in instructions) {
-        println("Instruction: $instruction, State: $state" )
-        state = instruction.action(state)
-        println("=========================> State: $state" )
-        if (state.ip in encounteredIndices) return state
-        encounteredIndices += state.ip
-    }
-    println("No loop found – program terminates!")
-    return state
-}
-
-
 fun mutate(instructions: List<Instruction>) = sequence<List<Instruction>> {
     for ((index, instruction) in instructions.withIndex()) {
         val newProgram = instructions.toMutableList()

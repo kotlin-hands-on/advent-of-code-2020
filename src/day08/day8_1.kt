@@ -4,11 +4,15 @@ import java.io.File
 
 val instructions = File("src/day08/input.txt")
     .readLines()
-    .map(Instruction::fromString)
+    .map { Instruction(it) }
 
 fun main() {
     println(execute(instructions))
-    println(mutate(instructions).map { execute(it) }.first { it.ip >= instructions.size })
+    println(
+        mutate(instructions)
+            .map { modifiedProgram -> execute(modifiedProgram) }
+            .first { state -> state.ip >= instructions.size }
+    )
 }
 
 data class MachineState(val ip: Int, val acc: Int)
@@ -38,23 +42,21 @@ fun mutate(instructions: List<Instruction>) = sequence<List<Instruction>> {
     }
 }
 
-sealed class Instruction(val action: (MachineState) -> MachineState) {
-    companion object {
-        fun fromString(s: String): Instruction {
-            val (instr, immediate) = s.split(" ")
-            val value = immediate.toInt()
-            return when (instr) {
-                "nop" -> Nop(value)
-                "acc" -> Acc(value)
-                "jmp" -> Jmp(value)
-                else -> error("Invalid opcode!")
-            }
-        }
-    }
-}
+sealed class Instruction(val action: (MachineState) -> MachineState)
 
 class Nop(val value: Int) : Instruction({ MachineState(it.ip + 1, it.acc) })
 
 class Acc(val value: Int) : Instruction({ MachineState(it.ip + 1, it.acc + value) })
 
 class Jmp(val value: Int) : Instruction({ MachineState(it.ip + value, it.acc) })
+
+fun Instruction(s: String): Instruction {
+    val (instr, immediate) = s.split(" ")
+    val value = immediate.toInt()
+    return when (instr) {
+        "nop" -> Nop(value)
+        "acc" -> Acc(value)
+        "jmp" -> Jmp(value)
+        else -> error("Invalid opcode!")
+    }
+}

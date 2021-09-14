@@ -15,6 +15,10 @@ fun main() {
         !isOccupied(index) && isOccupied(index - 1) && isOccupied(index + 1)
     }
     println("My seat ID: $mySeat")
+
+    // Alternative solution:
+    val missingSeats = (1..maxID).toSet() - seatIDs
+    println("My seat ID (2): ${missingSeats.last()}")
 }
 
 fun String.toSeatID(): Int = this

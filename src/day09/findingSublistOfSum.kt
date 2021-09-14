@@ -26,7 +26,6 @@ fun List<Long>.findSublistOfSumV2(sum: Long): List<Long>? =
     indices.firstNotNullOfOrNull { fromIndex ->
         ((fromIndex + 1)..size)
             .firstNotNullOfOrNull { toIndex ->
-                val subList = subList(fromIndex, toIndex)
-                if (subList.sum() == sum) subList else null
+                subList(fromIndex, toIndex).takeIf { it.sum() == sum }
             }
     }

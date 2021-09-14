@@ -37,7 +37,7 @@ fun List<Long>.findSublistOfSum(sum: Long): List<Long> =
     (2..size).firstNotNullOf { sublistSize ->
         asSequence()
             .windowed(sublistSize)
-            .firstOrNull { subList ->
-                subList.sum() == sum
+            .firstOrNull { sublist ->
+                sublist.sum() == sum
             }
     }

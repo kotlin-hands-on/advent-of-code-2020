@@ -17,7 +17,11 @@ fun main() {
 
     println("First answer: $firstAnswer") // 6273
 
-    val secondAnswer = transformAndReduce(groups, Set<Char>::intersect)
+    val secondAnswer = groups.map { lines ->
+        lines.split(newLine).map(String::toSet)
+    }.sumOf { characters ->
+        characters.reduce { a, b -> a intersect b }.count()
+    }
 
     println("Second answer: $secondAnswer") // 3254
 }

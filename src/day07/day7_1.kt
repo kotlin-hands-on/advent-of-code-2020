@@ -2,42 +2,47 @@ package day07
 
 import java.io.File
 
-val containersOfBag = hashMapOf<String, Set<String>>()
+typealias Color = String
+typealias Rule = Set<String>
 
 private const val SHINY_GOLD = "shiny gold"
 
 fun main() {
-    buildBagTree()
+    val rules: Map<Color, Rule> = buildBagTree()
+    val containers = findContainersDFS(rules)
+    println(containers)
+    println()
+    println(containers.size)
+}
 
+fun findContainersDFS(rules: Map<Color, Rule>): Set<Color> {
     var known = setOf(SHINY_GOLD)
-    var next = setOf(SHINY_GOLD) + containersOfBag[SHINY_GOLD]!!
+    var next = setOf(SHINY_GOLD) + rules[SHINY_GOLD]!!
     while (true) {
         val toFind = next - known
         if (toFind.isEmpty()) break
         known = known + next
-        next = toFind.mapNotNull { containersOfBag[it] }.flatten().toSet()
+        next = toFind.mapNotNull { rules[it] }.flatten().toSet()
     }
-    println(known - SHINY_GOLD)
-    println((known - SHINY_GOLD).size)
+    return known - SHINY_GOLD
 }
 
-private fun buildBagTree() {
+private fun buildBagTree(): Map<Color, Rule> {
+    val rules = hashMapOf<Color, Rule>()
     File("src/day07/input.txt")
-        .forEachLine {
-            val parentWithChildren = it
+        .forEachLine { line ->
+            val (parent, allChildren) = line
                 .replace(Regex("\\d+"), "")
                 .replace(Regex("bags?\\.?"), "")
                 .split("contain")
-            val parent = parentWithChildren[0].trim()
-            val children = parentWithChildren[1].split(',').map { z -> z.trim() }.toSet()
-            addBag(parent, children)
+                .map { it.trim() }
+            val childrenColors = allChildren.split(',').map { it.trim() }.toSet()
+            for (childColor in childrenColors) {
+                rules.compute(childColor) { _, current ->
+                    if (current == null) setOf(parent)
+                    else current + parent
+                }
+            }
         }
-}
-
-private fun addBag(parent: String, children: Set<String>) {
-    for (child in children) {
-        containersOfBag.compute(child) { _, current ->
-            if (current == null) setOf(parent) else current + parent
-        }
-    }
+    return rules
 }

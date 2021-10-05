@@ -1,17 +1,30 @@
 package day08.one
 
 import java.io.File
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTimedValue
 
 val instructions = File("src/day08/input.txt")
     .readLines()
     .map { Instruction(it) }
 
+@OptIn(ExperimentalTime::class)
 fun main() {
-    println(execute(instructions))
+    println(measureTimedValue { execute(instructions) })
+    println(measureTimedValue { executeMutably(instructions) })
     println(
-        mutate(instructions)
-            .map { modifiedProgram -> execute(modifiedProgram) }
-            .first { state -> state.ip >= instructions.size }
+        measureTimedValue {
+            mutate(instructions)
+                .map { modifiedProgram -> execute(modifiedProgram) }
+                .first { state -> state.ip !in instructions.indices }
+        }
+    )
+    println(
+        measureTimedValue {
+            mutate(instructions)
+                .map { modifiedProgram -> executeMutably(modifiedProgram) }
+                .first { state -> state.ip >= instructions.size }
+        }
     )
 }
 
@@ -20,7 +33,7 @@ data class MachineState(val ip: Int, val acc: Int)
 fun execute(instructions: List<Instruction>): MachineState {
     var state = MachineState(0, 0)
     val encounteredIndices = mutableSetOf<Int>()
-    while (state.ip < instructions.size) {
+    while (state.ip in instructions.indices) {
         val nextInstruction = instructions[state.ip]
         state = nextInstruction.action(state)
         if (state.ip in encounteredIndices) return state
@@ -28,6 +41,24 @@ fun execute(instructions: List<Instruction>): MachineState {
     }
     println("No loop found – program terminates!")
     return state
+}
+
+fun executeMutably(instructions: List<Instruction>): MachineState {
+    var ip: Int = 0
+    var acc: Int = 0
+    val encounteredIndices = mutableSetOf<Int>()
+    while (ip in instructions.indices) {
+        when (val nextInstr = instructions[ip]) {
+            is Acc -> {
+                ip++; acc += nextInstr.value
+            }
+            is Jmp -> ip += nextInstr.value
+            is Nop -> ip++
+        }
+        if (ip in encounteredIndices) return MachineState(ip, acc)
+        encounteredIndices += ip
+    }
+    return MachineState(ip, acc)
 }
 
 fun mutate(instructions: List<Instruction>) = sequence<List<Instruction>> {
